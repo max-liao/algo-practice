@@ -1,3 +1,5 @@
+// https://techdevguide.withgoogle.com/resources/former-interview-question-compression-and-decompression/#!
+
 class DecompressString {
     constructor(public string: string) {
         this.incrementEntry()
@@ -58,5 +60,11 @@ class DecompressString {
 }
 const input1 = '2[3[a]b]' // decompresses into aaabaaab
 const input2 = '2[3[a]4[b]]' // decompresses into aaabbbbaaabbbb
-new DecompressString(input1)
-new DecompressString(input2)
+
+const input3 = 'a[]b'
+const input4 = '2[3[a]b]0[abc]a'
+// new DecompressString(input1)
+// new DecompressString(input2)
+// new DecompressString(input3)
+new DecompressString(input4)
+// console.log('a'.repeat(0))

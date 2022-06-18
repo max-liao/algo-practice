@@ -1,3 +1,4 @@
+// https://techdevguide.withgoogle.com/resources/former-interview-question-compression-and-decompression/#!
 class DecompressString {
     string;
     constructor(string) {
@@ -36,6 +37,7 @@ class DecompressString {
             else if (this.stringsToAdd.length) {
                 const multiplier = this.multipliers.pop();
                 this.output += [...this.stringsToAdd].join('').repeat(multiplier);
+                this.stringsToAdd = [];
             }
         }
         else {
@@ -58,6 +60,11 @@ class DecompressString {
     }
 }
 const input1 = '2[3[a]b]'; // decompresses into aaabaaab
-const input2 = '2[3[a]4[b]]'; // decompresses into aaabaaab
-new DecompressString(input1);
-new DecompressString(input2);
+const input2 = '2[3[a]4[b]]'; // decompresses into aaabbbbaaabbbb
+const input3 = 'a[]b';
+const input4 = '2[3[a]b]0[abc]a';
+// new DecompressString(input1)
+// new DecompressString(input2)
+// new DecompressString(input3)
+new DecompressString(input4);
+// console.log('a'.repeat(0))
