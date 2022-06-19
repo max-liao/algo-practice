@@ -1,7 +1,5 @@
 // https://techdevguide.withgoogle.com/resources/former-interview-question-compression-and-decompression/#!
-const input1 = '2[3[a]b]' // decompresses into aaabaaab
-const input2 = '2[3[a]4[b]]' // decompresses into aaabbbbaaabbbb
-const input3 = 'a[]b'
+
 
 // 2 -> [, is number, grab rest of number (look for '['), and add to multiplier stack
 // [ -> 1, is left bracket, begin constructedStringsArr
@@ -99,8 +97,13 @@ class DecompressString {
     }
 }
 
+const input1 = '2[3[a]b]' // decompresses into aaabaaab
+const input2 = '2[3[a]4[b]]' // decompresses into aaabbbbaaabbbb
+const input3 = 'a[]b'
+const input4 = '2[10[a]b]0[abc]a[]b'
+const input5 = '2[3[a]4[b]b]' // decompresses into aaabbbbaaabbbb
 // new DecompressString(input1)
 // new DecompressString(input2)
 // new DecompressString(input3)
 // new DecompressString(input4)
-const input4 = '2[10[a]b]0[abc]a[]b'
+new DecompressString(input5)

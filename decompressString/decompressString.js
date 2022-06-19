@@ -1,7 +1,4 @@
 // https://techdevguide.withgoogle.com/resources/former-interview-question-compression-and-decompression/#!
-const input1 = '2[3[a]b]'; // decompresses into aaabaaab
-const input2 = '2[3[a]4[b]]'; // decompresses into aaabbbbaaabbbb
-const input3 = 'a[]b';
 // 2 -> [, is number, grab rest of number (look for '['), and add to multiplier stack
 // [ -> 1, is left bracket, begin constructedStringsArr
 // ! constructedStringsArr consists of strings that need to be multiplied
@@ -56,7 +53,6 @@ class DecompressString {
                 if (nextElement === '[') {
                     // end of number - add to multiplier stack
                     const multiplierToAdd = Number(this.currentNumStr);
-                    console.log('multiplierToAdd:', multiplierToAdd);
                     this.multipliers.push(multiplierToAdd);
                     this.currentNumStr = '';
                 }
@@ -70,8 +66,6 @@ class DecompressString {
             else if (currElement === ']') {
                 if (this.currentString.length || this.stringsToAdd.length) {
                     const multiplier = this.multipliers.pop();
-                    console.log('this.currentString:', this.currentString);
-                    console.log('multiplier:', multiplier);
                     if (this.multipliers.length > 0) {
                         this.stringsToAdd.push(this.currentString.repeat(multiplier));
                     }
@@ -80,7 +74,6 @@ class DecompressString {
                         this.output += [...this.stringsToAdd].join('').repeat(multiplier);
                         this.stringsToAdd = [];
                     }
-                    console.log('this.stringsToAdd:', this.stringsToAdd);
                     this.currentString = '';
                 }
             }
@@ -100,8 +93,13 @@ class DecompressString {
         return this.string.substring(this.currentIndex, endInd);
     }
 }
-// new DecompressString(input1)
-new DecompressString(input2);
-// new DecompressString(input3)
+const input1 = '2[3[a]b]'; // decompresses into aaabaaab
+const input2 = '2[3[a]4[b]]'; // decompresses into aaabbbbaaabbbb
+const input3 = 'a[]b';
 const input4 = '2[10[a]b]0[abc]a[]b';
+const input5 = '2[3[a]4[b]b]'; // decompresses into aaabbbbaaabbbb
+// new DecompressString(input1)
+// new DecompressString(input2)
+// new DecompressString(input3)
 // new DecompressString(input4)
+new DecompressString(input5);
