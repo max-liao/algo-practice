@@ -1,5 +1,4 @@
 // https://techdevguide.withgoogle.com/paths/interview/
-
 // https://techdevguide.withgoogle.com/resources/former-interview-question-flatten-iterators/#!
 
 const arr1 = [1, 2, 3];
@@ -22,6 +21,7 @@ class IteratorFlattener {
         while (this.hasNext()) {
             this.next();
         }
+        this.currentInd = 0
     }
 
     public next() {
