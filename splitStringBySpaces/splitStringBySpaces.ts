@@ -29,7 +29,6 @@ function splitStringBySpaces(inputString: string, answer: string[]): string[] {
 
     let leftBound = 0
     let quoteNeedsPair = false
-    // let lastSpaceOnRight = 0
     let lastSpacesOnRight: number[] = []
 
     const pushSubstring = (index) => {
@@ -40,10 +39,10 @@ function splitStringBySpaces(inputString: string, answer: string[]): string[] {
     // if space found before leftQuoteNeedsPair
     for (let i = 0; i < inputString.length; i++) {
         const char = inputString[i]
-        // " found
         if (char === doubleQuote) {
-            // clear spaces if inside quotes
+            // " found
             if (quoteNeedsPair) {
+                // clear spaces if matching quotes found (not at end)
                 lastSpacesOnRight = []
             }
             quoteNeedsPair = quoteNeedsPair ? false : true
