@@ -15,6 +15,7 @@
 */
 
 type WordInfo = {
+    wordInd: number,
     word: string,
     possibleInds: Set<number>
 }
@@ -27,6 +28,7 @@ class WordSquares {
     constructor(public allWords: string[]) {
         this.setupRecords(allWords)
         this.populatePossibleInds(allWords)
+        console.log(this.firstLetters)
         console.log(this.wordsInfo)
     }
 
@@ -40,6 +42,7 @@ class WordSquares {
                 this.firstLetters[firstLetter].push(wordInd);
             }
             this.wordsInfo[wordInd] = {
+                wordInd: wordInd,
                 word: word,
                 possibleInds: new Set([0])
             }
@@ -66,6 +69,9 @@ class WordSquares {
                 }
             }
         }
+        this.wordsInfo.sort((a, b) => {
+            return a.possibleInds.size - b.possibleInds.size
+        })
     }
 }
 
@@ -77,10 +83,18 @@ class WordSquares {
 // LEAD
 // LADY
 
-// inds.LADY = [0, 2, 3] // ! LADY is only word with [3], try there
-// inds.BALL = [0] // ! BALL only has [0], try there to pass/fail
-// inds.AREA = [0, 1, 2] // ! BALL, AREA is [1]
-// inds.LEAD = [0, 1, 2] // ! BALL, LADY[3] is taken, LEAD is [2]
+// inds.BALL = [0]
+// inds.LADY = [0, 2, 3]
+// inds.LEAD = [0, 2, 3]
+// inds.AREA = [0, 1, 2, 3]
+// ! BALL -> finalWords[0] -> wordInd = 1, usedInds = [1]
+// letterInd = 1, 'A' -> this.firstLetters['A'], [2] -> words[2] -> AREA -> finalWords[letterInd], wordInd = 2, usedInds = [1, 2]
+// letterInd = 2, 'L' -> this.firstLetters['L'], [0, 3]
+// words[0] -> LADY -> AREA[letterInd], 'E' is out of place. LADY[1], 'A'
+// words[3] -> LEAD -> AREA[letterInd], 'E' is in place. LEAD[1], 'E' -> LEAD -> finalWords[letterInd], usedInds = [1, 2, 3]
+// letterInd = 3, 'L' -> this.firstLetters['L'], [0, 3], filter usedInds -> [0] -> LADY -> finalWords[letterInd]
+
+
 const words1 = ['LADY', 'BALL', 'AREA', 'LEAD']
 new WordSquares(words1)
 
@@ -90,8 +104,8 @@ new WordSquares(words1)
 // POP
 // OPA
 // PAP
-// inds.POP = [0, 1]
-// inds.OPA = [0, 1, 2]
+// inds.POP = [0, 1] // ! first try POP as [0]
+// inds.OPA = [0, 1, 2] // ! POP, 
 // inds.PAP = [0, 1, 2] 
 // const words2 = ['OPA', 'POP', 'PAP']
 // new WordSquares(words2)
