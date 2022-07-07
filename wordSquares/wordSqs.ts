@@ -21,22 +21,26 @@ type WordInfo = {
 }
 
 type WordRecord = {
-    firstLetters: Record<string, number[]>,
+    firstLtrs: Record<string, number[]>,
     wordsInfo: WordInfo[],
     words: string[]
 }
 
 class WordSquares {
+    currentWR: WordRecord
+    testWordSquare: string[] = []
+
     constructor(public allWords: string[]) {
-        let wordRecords = this.setupRecords(allWords)
-        if (wordRecords) {
-            wordRecords = this.populatePossibleInds(wordRecords)
-            this.isWordSquare(wordRecords)
+        const recordsSetup = this.setupRecords(allWords)
+        if (recordsSetup) {
+            this.populatePossibleInds()
+            this.isWordSquare()
         }
     }
 
-    // returns false when words isNOT a wordSquare
-    setupRecords(words: string[]): WordRecord | false {
+
+    // returns false when words is NOT a wordSquare
+    setupRecords(words: string[]): boolean {
         const firstLetters: Record<string, number[]> = {}; // <letter, wordInds>
         const wordsInfo: WordInfo[] = [];
         for (let wordInd = 0; wordInd < words.length; wordInd++) {
@@ -57,97 +61,101 @@ class WordSquares {
                 possibleInds: new Set([0])
             }
         }
-        return {
-            firstLetters: firstLetters,
+        this.currentWR = {
+            firstLtrs: firstLetters,
             wordsInfo: wordsInfo,
             words: words
         }
+        return true
     }
 
-    populatePossibleInds(wordRecords: WordRecord): WordRecord {
-        for (let wordInd = 0; wordInd < wordRecords.words.length; wordInd++) {
-            const word = wordRecords.words[wordInd]
+    populatePossibleInds() {
+        for (let wordInd = 0; wordInd < this.currentWR.words.length; wordInd++) {
+            const word = this.currentWR.words[wordInd]
             // wordSqaures can be 2x2, 3x3, 4x4, 5x5, etc.
             for (let letterInd = 1; letterInd < word.length; letterInd++) {
                 const letter = word[letterInd];
-                if (wordRecords.firstLetters[letter]) {
-                    wordRecords.firstLetters[letter].forEach((wordIndex) => {
+                if (this.currentWR.firstLtrs[letter]) {
+                    this.currentWR.firstLtrs[letter].forEach((wordIndex) => {
                         // all words beginning with letter need letterInd added to their possibleInds
-                        wordRecords.wordsInfo[wordIndex].possibleInds.add(letterInd);
+                        this.currentWR.wordsInfo[wordIndex].possibleInds.add(letterInd);
                     })
                 }
             }
         }
-        wordRecords.wordsInfo.sort((a, b) => {
+        this.currentWR.wordsInfo.sort((a, b) => {
             return a.possibleInds.size - b.possibleInds.size;
         })
-        return wordRecords;
     }
 
-    isWordSquare(wordRecords: WordRecord) {
-        // console.log(wordRecords)
-        // console.log(wordRecords.wordsInfo)
+    isWordSquare() {
+        // const usedInds: number[] = []
+        for (let i = 0; i < this.currentWR.wordsInfo.length; i++) {
+            const wordInfo = this.currentWR.wordsInfo[i];
+            const wordFits = this.checkWordFitsInSquare(wordInfo);
+            if (wordFits) {
+                break;
+            }
+        }
+        // reset currentWR and testWordSquare
+        this.currentWR = {
+            firstLtrs: {},
+            wordsInfo: [],
+            words: []
+        }
+        this.testWordSquare = []
+    }
 
-        const testWordSquare: string[] = []
-        const usedInds: number[] = []
-        for (let i = 0; i < wordRecords.wordsInfo.length; i++) {
-            const wordInfo = wordRecords.wordsInfo[i];
-            if (wordInfo.possibleInds.size === 1) {
-                // console.log(wordInfo)
-                const onePositionWordInd: number = wordInfo.possibleInds.values().next().value;
-                testWordSquare[onePositionWordInd] = wordInfo.word;
-                usedInds.push(i);
-                for (let letterInd = 0; letterInd < wordInfo.word.length; letterInd++) {
-                    // skip onePositionWordInd as the word has been placed there
-                    if (letterInd !== onePositionWordInd) {
-                        const letter = wordInfo.word[letterInd];
-                        // look for letter in firstLetters
-                        // console.log('letter:', letter);
+    checkWordFitsInSquare(wordInfo: WordInfo) {
+        if (wordInfo.possibleInds.size === 1) {
+            const onePositionWordInd: number = wordInfo.possibleInds.values().next().value;
+            this.testWordSquare[onePositionWordInd] = wordInfo.word;
 
-                        if (wordRecords.firstLetters[letter].length === 1) {
-                            const matchedInd = wordRecords.firstLetters[letter][0];
-                            const wordToTry = wordRecords.words[matchedInd];
-                            testWordSquare[letterInd] = wordToTry;
-                        } else {
-                            for (let firstLtrMatch = 0; firstLtrMatch < wordRecords.firstLetters[letter].length; firstLtrMatch++) {
-                                const matchedInd = wordRecords.firstLetters[letter][firstLtrMatch];
-                                const possibleWord = wordRecords.words[matchedInd];
+            for (let letterInd = 0; letterInd < wordInfo.word.length; letterInd++) {
+                const letter = wordInfo.word[letterInd];
 
-                                // const testWord = testWordSquare[]
-                                for (let testSqInd = 1; testSqInd < testWordSquare.length; testSqInd++) {
-                                    const testWord = testWordSquare[testSqInd];
-                                    if (possibleWord[testSqInd] === testWord[letterInd]) {
-                                        testWordSquare[letterInd] = possibleWord;
-                                        break;
+                // skip onePositionWordInd as the word has been placed there
+                if (letterInd !== onePositionWordInd) {
+                    // look for letter in firstLetters
+                    if (this.currentWR.firstLtrs[letter].length === 1) {
+                        const matchedInd = this.currentWR.firstLtrs[letter][0];
+                        const wordToTry = this.currentWR.words[matchedInd];
+                        this.testWordSquare[letterInd] = wordToTry;
+                    } else {
+                        // if more than 1 word has same first letter, loop through the array
+                        for (let firstLtrMatch = 0; firstLtrMatch < this.currentWR.firstLtrs[letter].length; firstLtrMatch++) {
+                            const matchedInd = this.currentWR.firstLtrs[letter][firstLtrMatch];
+                            const possibleWord = this.currentWR.words[matchedInd];
+
+                            for (let testSqInd = 1; testSqInd < this.testWordSquare.length; testSqInd++) {
+                                const testWord = this.testWordSquare[testSqInd];
+                                if (possibleWord[testSqInd] === testWord[letterInd]) {
+                                    this.testWordSquare[letterInd] = possibleWord;
+                                    if (this.testWordSquare.length === this.currentWR.words.length) {
+                                        console.log(this.currentWR.words, 'IS a wordsquare');
+                                        return true
                                     }
                                 }
                             }
                         }
-
-                        // ! BALL -> finalWords[0] -> wordInd = 1, usedInds = [1]
-                        // console.log(this.wordsInfo)
-                        // letterInd = 1, 'A' -> this.firstLetters['A'], [2] ->
-                        // words[2] -> AREA -> finalWords[letterInd], wordInd = 2, usedInds = [1, 2]
-                        // letterInd = 2, 'L' -> this.firstLetters['L'], [0, 3]
-                        // words[0], LADY, check against rest of grid
-                        // L'A'DY vs AR'E'A. possibleWord[1] must equal testWordSquare[1][letterInd] ! doesn't
-                        // L'E'AD vs AR'E'A. possibleWord[1] must equal testWordSquare[1][letterInd]
-                        // letterInd = 3, L'A'DY vs ARE'A'. possibleWord[1] must equal testWordSquare[1][letterInd]
-
-
-
-                        // words[3] -> LEAD -> AREA[letterInd], 'E' is in place. LEAD[1], 'E' -> LEAD -> finalWords[letterInd], usedInds = [1, 2, 3]
-                        // 'L' -> this.firstLetters['L'], [0, 3], filter usedInds -> [0] -> LADY -> finalWords[letterInd]
                     }
                 }
             }
-        }
-        if (testWordSquare.length === wordRecords.words.length) {
-            console.log(wordRecords.words, 'IS a wordsquare');
         } else {
-            console.log(wordRecords.words, 'is NOT wordsquare');
+            // ! pass case 2
+            // words = [OPA, POP, PAP]
+            // POP
+            // OPA
+            // PAP
+            // inds.OPA = [0, 1] // ! first try OPA as [0]
+            // inds.POP = [0, 1, 2] // ! OPA
+            // inds.PAP = [0, 1, 2] 
+            console.log('wordInfo:', wordInfo);
         }
+        return false;
     }
+    // console.log('this.currentWR:', this.currentWR);
+    // console.log(this.currentWR.words, 'is NOT wordsquare');
 }
 
 
@@ -191,6 +199,6 @@ new WordSquares(words2)
 // A -> 3rd char of OPA
 // P -> 3rd char of PAP. return true
 
-// fail Case
-const words3 = ['OPA', 'POD', 'PAP']
-new WordSquares(words3)
+// ! fail Case
+// const words3 = ['OPA', 'POD', 'PAP']
+// new WordSquares(words3)
