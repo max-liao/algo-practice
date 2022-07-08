@@ -16,13 +16,13 @@
 class WordSquares {
     allWords;
     currentWR;
-    testWordSquare = [];
+    testWordSq = [];
     constructor(allWords) {
         this.allWords = allWords;
         const recordsSetup = this.setupRecords(allWords);
         if (recordsSetup) {
             this.populatePossibleInds();
-            this.isWordSquare();
+            this.checkCurrentWR();
         }
     }
     // returns false when words is NOT a wordSquare
@@ -73,14 +73,17 @@ class WordSquares {
             return a.possibleInds.size - b.possibleInds.size;
         });
     }
-    isWordSquare() {
-        // const usedInds: number[] = []
+    checkCurrentWR() {
+        let wordFits = false;
         for (let i = 0; i < this.currentWR.wordsInfo.length; i++) {
             const wordInfo = this.currentWR.wordsInfo[i];
-            const wordFits = this.checkWordFitsInSquare(wordInfo);
+            wordFits = this.checkWordAtPossibleIndex(wordInfo);
             if (wordFits) {
                 break;
             }
+        }
+        if (!wordFits) {
+            console.log(this.currentWR.words, 'is NOT a wordsquare');
         }
         // reset currentWR and testWordSquare
         this.currentWR = {
@@ -88,52 +91,66 @@ class WordSquares {
             wordsInfo: [],
             words: []
         };
-        this.testWordSquare = [];
+        this.testWordSq = [];
     }
-    checkWordFitsInSquare(wordInfo) {
-        if (wordInfo.possibleInds.size === 1) {
-            const onePositionWordInd = wordInfo.possibleInds.values().next().value;
-            this.testWordSquare[onePositionWordInd] = wordInfo.word;
+    checkWordAtPossibleIndex(wordInfo) {
+        const possInds = [...wordInfo.possibleInds];
+        for (let index = 0; index < possInds.length; index++) {
+            const possibleInd = possInds[index];
+            // const this.testWordSq: string[] = [];
+            // const usedInds: number[] = [];
+            this.testWordSq[possibleInd] = wordInfo.word;
+            // usedInds.push(possibleInd);
             for (let letterInd = 0; letterInd < wordInfo.word.length; letterInd++) {
                 const letter = wordInfo.word[letterInd];
-                // skip onePositionWordInd as the word has been placed there
-                if (letterInd !== onePositionWordInd) {
-                    // look for letter in firstLetters
-                    if (this.currentWR.firstLtrs[letter].length === 1) {
-                        const matchedInd = this.currentWR.firstLtrs[letter][0];
-                        const wordToTry = this.currentWR.words[matchedInd];
-                        this.testWordSquare[letterInd] = wordToTry;
-                    }
-                    else {
-                        // if more than 1 word has same first letter, loop through the array
-                        for (let firstLtrMatch = 0; firstLtrMatch < this.currentWR.firstLtrs[letter].length; firstLtrMatch++) {
-                            const matchedInd = this.currentWR.firstLtrs[letter][firstLtrMatch];
-                            const possibleWord = this.currentWR.words[matchedInd];
-                            for (let testSqInd = 1; testSqInd < this.testWordSquare.length; testSqInd++) {
-                                const testWord = this.testWordSquare[testSqInd];
-                                if (possibleWord[testSqInd] === testWord[letterInd]) {
-                                    this.testWordSquare[letterInd] = possibleWord;
-                                    if (this.testWordSquare.length === this.currentWR.words.length) {
-                                        console.log(this.currentWR.words, 'IS a wordsquare');
-                                        return true;
-                                    }
+                // if only one word has this first letter, set to testWordSquare
+                if (!this.currentWR.firstLtrs[letter]) {
+                    return false;
+                }
+                else if (this.currentWR.firstLtrs[letter].length === 1) {
+                    const matchedInd = this.currentWR.firstLtrs[letter][0];
+                    const wordToTry = this.currentWR.words[matchedInd];
+                    this.testWordSq[letterInd] = wordToTry;
+                }
+                else {
+                    // if more than 1 word has same first letter, loop through the array
+                    for (let firstLtrMatch = 0; firstLtrMatch < this.currentWR.firstLtrs[letter].length; firstLtrMatch++) {
+                        const matchedInd = this.currentWR.firstLtrs[letter][firstLtrMatch];
+                        const possibleWord = this.currentWR.words[matchedInd];
+                        for (let testSqInd = 1; testSqInd < this.testWordSq.length; testSqInd++) {
+                            const testWord = this.testWordSq[testSqInd];
+                            if (possibleWord[testSqInd] === testWord[letterInd]) {
+                                this.testWordSq[letterInd] = possibleWord;
+                                if (this.testWordSq.length === this.currentWR.words.length) {
+                                    console.log(this.currentWR.words, 'IS a wordsquare');
+                                    return true;
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        else {
             // ! pass case 2
             // words = [OPA, POP, PAP]
             // POP
             // OPA
             // PAP
-            // inds.OPA = [0, 1] // ! first try OPA as [0]
+            // inds.OPA = [0, 1] 
             // inds.POP = [0, 1, 2] // ! OPA
-            // inds.PAP = [0, 1, 2] 
-            console.log('wordInfo:', wordInfo);
+            // inds.PAP = [0, 1, 2]
+            // ! first try OPA as [0]
+            // usedInds = [0]
+            // letterInd = 1, 'P' -> this.firstLetters['P'], [1, 2] ->
+            // words[1], POP
+            // letterInd = 2, 'A' -> this.firstLetters['A'], [] -? Fail
+            // ! first try POP as [0]
+            // usedInds = [1]
+            // letterInd = 1, 'O' -> this.firstLetters['O'], [0]
+            // words[1], OPA
+            // letterInd = 2, 'P' -> this.firstLetters['P'], [1, 2] -> filter usedInds -> [2]
+            // words[2], PAP
+            // ? run wordsquare calc?
+            // console.log('wordInfo:', wordInfo);
         }
         return false;
     }
@@ -156,8 +173,8 @@ new WordSquares(words1);
 // OPA
 // PAP
 // inds.POP = [0, 1] // ! first try POP as [0]
-// inds.OPA = [0, 1, 2] // ! POP, 
-// inds.PAP = [0, 1, 2] 
+// inds.OPA = [0, 1, 2] // ! POP,
+// inds.PAP = [0, 1, 2]
 const words2 = ['OPA', 'POP', 'PAP'];
 new WordSquares(words2);
 // POP -> first char P. remove POP from words to check
@@ -170,5 +187,5 @@ new WordSquares(words2);
 // A -> 3rd char of OPA
 // P -> 3rd char of PAP. return true
 // ! fail Case
-// const words3 = ['OPA', 'POD', 'PAP']
-// new WordSquares(words3)
+const words3 = ['OPA', 'POD', 'PAP'];
+new WordSquares(words3);
