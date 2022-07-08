@@ -1,7 +1,7 @@
 // recreate minesweeper
 // https://techdevguide.withgoogle.com/resources/former-interview-question-minesweeper/#!
 
-type gridSpace = {
+type GridSpace = {
     col: number
     row: number
     revealed: boolean
@@ -10,27 +10,46 @@ type gridSpace = {
 
 class MineSweeper {
 
-    constructor(public grid: number[][]) {
-        // copy input grid to a revealedGrid visible to the player
-        for (let i = 0; i < grid.length; i++) {
-            const row = grid[i];
-            for (let j = 0; j < row.length; j++) {
-                const gridVal = row[j];
-                const newSpace: gridSpace = {
-                    col: j,
-                    row: i,
-                    revealed: false,
-                    value: gridVal
-                };
-                this.revealedGrid[i][j] = newSpace;
+    constructor(public numRows: number, public numCols: number, public numMines: number) {
+        // TODO place mines
+        // if more mines than spaces randomize spaces
+        // make set of coords of mines/spaces equal to the mine#
+        // pick 2 random numbers (0:rows) (0:cols), add to set of coords [rowI, colI]
+        const mineCoords: GridSpace[] = [];
+
+        // populate grid and populate revealedGrid with GridSpace[]
+        for (let i = 0; i < numRows; i++) {
+            this.grid[i] = []
+            // this.grid[i] = new Array(numCols).fill(0);
+            for (let j = 0; j < numCols; j++) {
+                // if [i, j] contained in
+                // this.grid[i][j] = 0
             }
         }
+        console.log(this.grid)
+
+
+        // copy input grid to a revealedGrid visible to the player
+        // for (let i = 0; i < this.grid.length; i++) {
+        //     const row = this.grid[i];
+        //     for (let j = 0; j < row.length; j++) {
+        //         const gridVal = row[j];
+        //         const newSpace: gridSpace = {
+        //             col: j,
+        //             row: i,
+        //             revealed: false,
+        //             value: gridVal
+        //         };
+        //         this.revealedGrid[i][j] = newSpace;
+        //     }
+        // }
     }
 
     public rows: number;
     public cols: number;
 
-    public revealedGrid: gridSpace[][];
+    public grid: number[][] = []
+    public revealedGrid: number[][] = []
 
     public static mineVal = 9;
     public static emptyVal = 0;
@@ -58,4 +77,6 @@ class MineSweeper {
 
         }
     }
-}; 
+};
+
+new MineSweeper(5, 4, 5)
