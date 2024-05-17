@@ -2,7 +2,11 @@ import random
 
 
 def print_board(board):
-    for row in [board[i : i + 3] for i in range(0, len(board), 3)]:
+    # show the input number if the spot has not been played yet
+    display_board = [
+        str(i + 1) if spot == " " else spot for i, spot in enumerate(board)
+    ]
+    for row in [display_board[i : i + 3] for i in range(0, len(display_board), 3)]:
         print("|".join(row))
         print("-" * 5)
 
