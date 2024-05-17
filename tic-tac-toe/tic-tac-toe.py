@@ -38,10 +38,16 @@ def tic_tac_toe():
 
     while True:
         print_board(board)
-        move = int(input("Enter your move (1-9): ")) - 1
-
-        if board[move] != " ":
-            print("Spot already taken. Try again.")
+        try:
+            move = int(input("Enter your move (1-9): ")) - 1
+            if move < 0 or move >= 9:
+                print("Invalid move. Please enter a number between 1 and 9.")
+                continue
+            if board[move] != " ":
+                print("Spot already taken. Try again.")
+                continue
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 9.")
             continue
 
         board[move] = player
